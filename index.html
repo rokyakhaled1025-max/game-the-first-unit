@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لعبة مصمم المواقع</title>
+<style>
+:root{--sky:#CFE8F7;--blue:#2F80B7;--mint:#9BD8C0;--green:#5FBF9E;--yellow:#FFE9A8;--ink:#24425A;--coral:#F6B8B0;--white:#fff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--sky);color:var(--ink);font-family:Tahoma,Arial,"Segoe UI",sans-serif}
+body{padding:16px;display:flex;justify-content:center}
+#app{width:100%;max-width:900px}
+h1,h2,h3,p{margin:0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--blue);color:#fff;border-radius:22px;padding:14px 20px;margin-bottom:18px;box-shadow:0 4px 10px rgba(36,66,90,.18)}
+.top h1{font-size:clamp(22px,4vw,32px)}
+.stars-total{background:var(--yellow);color:var(--ink);border-radius:999px;padding:6px 16px;font-weight:bold;font-size:20px;white-space:nowrap}
+.btn{font:inherit;font-weight:bold;font-size:22px;border:0;border-radius:999px;padding:12px 28px;background:var(--blue);color:#fff;cursor:pointer;box-shadow:0 4px 0 #20597f;transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #20597f}
+.btn.green{background:var(--green);box-shadow:0 4px 0 #3d8f74}
+.btn.light{background:#fff;color:var(--ink);box-shadow:0 4px 0 #a9c3d4}
+.card{background:#fff;border-radius:24px;padding:22px;box-shadow:0 4px 12px rgba(36,66,90,.15)}
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.game-card{cursor:pointer;text-align:center;border:0;font:inherit;color:inherit;transition:transform .12s}
+.game-card:hover{transform:translateY(-4px)}
+.game-card .ico{width:84px;height:84px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:bold;direction:ltr;white-space:nowrap}
+.game-card h3{font-size:26px;margin-bottom:8px}
+.game-card p{font-size:20px;line-height:1.6}
+.game-card .st{margin-top:10px;font-size:26px;letter-spacing:4px;color:#e0a526;min-height:32px}
+.hello{display:flex;align-items:center;gap:18px;margin-bottom:18px}
+.hello svg{width:110px;height:110px;flex:none}
+.hello p{font-size:24px;line-height:1.7;font-weight:bold}
+.bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.pill{background:#fff;border-radius:999px;padding:6px 18px;font-weight:bold;font-size:20px}
+.title{font-size:clamp(22px,4vw,30px);font-weight:bold;text-align:center;margin-bottom:6px}
+.sub{font-size:20px;text-align:center;margin-bottom:16px}
+/* match */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.col{display:flex;flex-direction:column;gap:12px}
+.item{font:inherit;font-weight:bold;font-size:22px;border:3px solid transparent;background:#fff;border-radius:18px;padding:14px 10px;min-height:64px;cursor:pointer;color:var(--ink);box-shadow:0 3px 0 #a9c3d4}
+.item.code{direction:ltr;font-family:"Courier New",monospace;color:var(--blue);font-size:24px}
+.item.sel{border-color:var(--blue);background:#EAF5FC}
+.item.done{background:var(--mint);border-color:var(--green);cursor:default;box-shadow:none}
+.item.bad,.slot.bad{animation:shake .4s;background:var(--coral)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+/* order */
+.board{background:var(--ink);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:8px;direction:ltr;margin-bottom:16px}
+.slot{display:flex;align-items:center;gap:10px;min-height:46px;border-radius:12px;background:rgba(255,255,255,.1);padding:4px 10px;color:#fff;font-family:"Courier New",monospace;font-size:22px;font-weight:bold;cursor:pointer}
+.slot .n{width:30px;height:30px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:16px;flex:none;font-family:Arial}
+.slot.filled{background:rgba(255,255,255,.22)}
+.slot.ok{background:var(--green);color:var(--ink)}
+.slot.bad{background:var(--coral);color:var(--ink)}
+.pool{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;direction:ltr;margin-bottom:16px;min-height:60px}
+.chip{font-family:"Courier New",monospace;font-weight:bold;font-size:21px;border:0;border-radius:14px;padding:10px 14px;background:var(--yellow);color:var(--ink);cursor:pointer;box-shadow:0 3px 0 #d9bf6a}
+.row-btns{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+/* quiz */
+.q{font-size:clamp(22px,4vw,30px);font-weight:bold;line-height:1.6;margin-bottom:16px;text-align:center}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{font:inherit;font-weight:bold;font-size:22px;border:3px solid transparent;background:#fff;border-radius:18px;padding:16px 12px;cursor:pointer;color:var(--ink);box-shadow:0 3px 0 #a9c3d4;min-height:66px}
+.opt.ltr{direction:ltr;font-family:"Courier New",monospace}
+.opt.right{background:var(--mint);border-color:var(--green)}
+.opt.wrong{background:var(--coral);border-color:#d77d72}
+.fb{margin-top:16px;padding:14px 18px;border-radius:18px;font-size:21px;font-weight:bold;text-align:center;line-height:1.6}
+.fb.ok{background:var(--mint)}.fb.no{background:var(--yellow)}
+.hearts{font-size:28px;color:#e0605a;letter-spacing:3px}
+.end{text-align:center}
+.end .big{font-size:64px;color:#e0a526;letter-spacing:8px;margin:8px 0}
+.end h2{font-size:32px;margin-bottom:10px}
+.end p{font-size:22px;margin-bottom:18px;line-height:1.6}
+.hidden{display:none!important}
+.conf{position:fixed;top:-20px;width:12px;height:18px;border-radius:3px;pointer-events:none;animation:fall linear forwards;z-index:9}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.9}}
+@media(max-width:560px){.opts,.cols{grid-template-columns:1fr}.hello svg{width:80px;height:80px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top"><h1>لعبة مصمم المواقع</h1><div class="stars-total">النجوم: <span id="total">0</span> / 9</div></div>
+  <div id="screen"></div>
+</div>
+
+<script>
+/* ===== helpers ===== */
+var $ = function(s){return document.querySelector(s)};
+var screenEl = $('#screen');
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function h(tag,attrs,html){var e=document.createElement(tag);for(var k in (attrs||{})){if(k==='class')e.className=attrs[k];else e.setAttribute(k,attrs[k])}if(html!==undefined)e.innerHTML=html;return e}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+/* saved stars (works without internet; safe if storage is blocked) */
+var stars={match:0,order:0,quiz:0};
+try{var sv=JSON.parse(localStorage.getItem('htmlGameStars')||'null');if(sv){stars=sv}}catch(e){}
+function saveStars(g,n){if(n>stars[g])stars[g]=n;try{localStorage.setItem('htmlGameStars',JSON.stringify(stars))}catch(e){}updTotal()}
+function updTotal(){$('#total').textContent=stars.match+stars.order+stars.quiz}
+function starText(n){return n>0?'★'.repeat(n)+'☆'.repeat(3-n):'☆☆☆'}
+/* sounds (generated in the browser, no files needed) */
+var ac=null;
+function tone(f,d,t,v){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.value=v||.15;o.connect(g);g.connect(ac.destination);var n=ac.currentTime;g.gain.setValueAtTime(v||.15,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.start(n);o.stop(n+d)}catch(e){}}
+function good(){tone(660,.12);setTimeout(function(){tone(990,.2)},110)}
+function bad(){tone(220,.25,'triangle',.18)}
+function click(){tone(520,.06)}
+function win(){[523,659,784,1047].forEach(function(f,i){setTimeout(function(){tone(f,.25)},i*130)});confetti()}
+function confetti(){var cols=['#2F80B7','#9BD8C0','#FFE9A8','#F6B8B0','#B7A6F0'];for(var i=0;i<46;i++){var c=h('div',{class:'conf'});c.style.left=Math.random()*100+'vw';c.style.background=cols[i%5];c.style.animationDuration=(2+Math.random()*2)+'s';c.style.animationDelay=(Math.random()*.6)+'s';document.body.appendChild(c);setTimeout(function(x){x.remove()},5000,c)}}
+var mascot='<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="56" fill="#fff" opacity=".7"/><path d="M26 70Q22 22 60 20Q98 22 94 70Q86 44 60 44Q34 44 26 70Z" fill="#2A1C15"/><circle cx="60" cy="66" r="30" fill="#F2C9A0"/><path d="M30 64Q32 32 60 32Q88 32 90 64Q78 46 60 46Q42 46 30 64Z" fill="#2A1C15"/><circle cx="49" cy="66" r="4" fill="#24425A"/><circle cx="71" cy="66" r="4" fill="#24425A"/><circle cx="42" cy="76" r="5" fill="#F4A6A0" opacity=".6"/><circle cx="78" cy="76" r="5" fill="#F4A6A0" opacity=".6"/><path d="M50 78Q60 88 70 78" stroke="#8A3B3B" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M22 120Q22 96 60 92Q98 96 98 120Z" fill="#2F80B7"/></svg>';
+
+/* ===== menu ===== */
+function menu(){
+  updTotal();
+  screenEl.innerHTML='';
+  var hello=h('div',{class:'card hello'},mascot+'<p>أهلًا يا مصمم المواقع! اختر لعبة واجمع النجوم.</p>');
+  var grid=h('div',{class:'menu'});
+  var games=[
+    ['match','وصّل الوسم','&lt;p&gt;','var(--yellow)','اختر الوسم ثم معناه الصحيح',startMatch],
+    ['order','رتّب الكود','1 2 3','var(--mint)','رتّب أسطر صفحة HTML الأولى',startOrder],
+    ['quiz','سؤال وجواب','؟','var(--coral)','أسئلة على الوحدة الأولى كلها',startQuiz]
+  ];
+  games.forEach(function(g){
+    var c=h('button',{class:'card game-card'},'<div class="ico" style="background:'+g[3]+'">'+g[2]+'</div><h3>'+g[1]+'</h3><p>'+g[4]+'</p><div class="st">'+starText(stars[g[0]])+'</div>');
+    c.onclick=function(){click();g[5]()};
+    grid.appendChild(c);
+  });
+  screenEl.appendChild(hello);screenEl.appendChild(grid);
+}
+function backBtn(){var b=h('button',{class:'btn light'},'القائمة');b.onclick=function(){click();menu()};return b}
+function endScreen(gameKey,n,msg,again){
+  saveStars(gameKey,n);if(n>0)win();else bad();
+  screenEl.innerHTML='';
+  var d=h('div',{class:'card end'},'<h2>'+(n>=3?'ممتاز!':n>0?'أحسنت!':'حاول مرة أخرى')+'</h2><div class="big">'+starText(n)+'</div><p>'+msg+'</p>');
+  var r=h('div',{class:'row-btns'});
+  var a=h('button',{class:'btn green'},'العب مرة أخرى');a.onclick=function(){click();again()};
+  r.appendChild(a);r.appendChild(backBtn());d.appendChild(r);screenEl.appendChild(d);
+}
+
+/* ===== game 1: match tags ===== */
+var TAGS=[['<html>','بداية ونهاية صفحة الويب'],['<head>','معلومات مهمة لا تظهر للمستخدم'],['<title>','عنوان الصفحة في شريط المتصفح'],['<body>','كل المحتوى الذي يظهر في الصفحة'],['<h1>','أكبر عنوان في الصفحة'],['<p>','لإنشاء فقرة نصية'],['<strong>','لجعل الخط غامقًا'],['<i>','لجعل الخط مائلًا'],['<img>','لإضافة صورة']];
+function startMatch(){
+  var pairs=shuffle(TAGS).slice(0,6),mistakes=0,left=6,sel=null;
+  screenEl.innerHTML='';
+  var bar=h('div',{class:'bar'});bar.appendChild(backBtn());var mp=h('div',{class:'pill'},'الأخطاء: 0');bar.appendChild(mp);
+  screenEl.appendChild(bar);
+  screenEl.appendChild(h('div',{class:'title'},'وصّل كل وسم بمعناه'));
+  screenEl.appendChild(h('div',{class:'sub'},'اضغط على الوسم ثم اضغط على المعنى المناسب'));
+  var cols=h('div',{class:'cols'}),cA=h('div',{class:'col'}),cB=h('div',{class:'col'});
+  shuffle(pairs).forEach(function(p){var b=h('button',{class:'item code'},esc(p[0]));b.dataset.k=p[0];cA.appendChild(b)});
+  shuffle(pairs).forEach(function(p){var b=h('button',{class:'item'},p[1]);b.dataset.k=p[0];cB.appendChild(b)});
+  cols.appendChild(cA);cols.appendChild(cB);screenEl.appendChild(cols);
+  cA.onclick=function(e){var b=e.target.closest('.item');if(!b||b.classList.contains('done'))return;click();[].forEach.call(cA.children,function(x){x.classList.remove('sel')});b.classList.add('sel');sel=b};
+  cB.onclick=function(e){var b=e.target.closest('.item');if(!b||b.classList.contains('done')||!sel)return;
+    if(b.dataset.k===sel.dataset.k){good();b.classList.add('done');sel.classList.remove('sel');sel.classList.add('done');sel=null;left--;
+      if(!left)setTimeout(function(){var n=mistakes<=1?3:mistakes<=3?2:1;endScreen('match',n,mistakes?'أخطاؤك: '+mistakes+'. جرّب أن تنتبه أكثر للنجمة التالية.':'بدون أي خطأ!',startMatch)},500)}
+    else{bad();mistakes++;mp.textContent='الأخطاء: '+mistakes;b.classList.add('bad');setTimeout(function(){b.classList.remove('bad')},450)}};
+}
+
+/* ===== game 2: order the code ===== */
+var CODE=['<html>','<head>','<title>My Page</title>','</head>','<body>','<h1>Hello!</h1>','<p>My first page.</p>','</body>','</html>'];
+function startOrder(){
+  var tries=0,slots=new Array(CODE.length).fill(null);
+  var pool=shuffle(CODE.map(function(c,i){return {t:c,i:i}}));
+  screenEl.innerHTML='';
+  var bar=h('div',{class:'bar'});bar.appendChild(backBtn());var tp=h('div',{class:'pill'},'المحاولات: 0');bar.appendChild(tp);screenEl.appendChild(bar);
+  screenEl.appendChild(h('div',{class:'title'},'رتّب أسطر صفحة HTML'));
+  screenEl.appendChild(h('div',{class:'sub'},'اضغط على السطر لتضعه في مكانه. اضغط على سطر في اللوحة لتعيده.'));
+  var board=h('div',{class:'board'}),poolEl=h('div',{class:'pool'}),msg=h('div',{class:'fb no hidden'});
+  var rb=h('div',{class:'row-btns'}),chk=h('button',{class:'btn green'},'تحقق');rb.appendChild(chk);
+  screenEl.appendChild(board);screenEl.appendChild(poolEl);screenEl.appendChild(rb);screenEl.appendChild(msg);
+  function draw(){
+    board.innerHTML='';poolEl.innerHTML='';
+    slots.forEach(function(s,k){var d=h('div',{class:'slot'+(s?' filled':'')},'<span class="n">'+(k+1)+'</span><span>'+(s?esc(s.t):'')+'</span>');
+      d.onclick=function(){if(!slots[k])return;click();pool.push(slots[k]);slots[k]=null;draw()};board.appendChild(d)});
+    pool.forEach(function(p){var c=h('button',{class:'chip'},esc(p.t));
+      c.onclick=function(){var k=slots.indexOf(null);if(k<0)return;click();slots[k]=p;pool.splice(pool.indexOf(p),1);draw()};poolEl.appendChild(c)});
+  }
+  chk.onclick=function(){
+    if(slots.indexOf(null)>=0){msg.className='fb no';msg.textContent='ضع كل الأسطر في أماكنها أولًا';return}
+    tries++;tp.textContent='المحاولات: '+tries;var ok=0;
+    [].forEach.call(board.children,function(d,k){var right=slots[k].i===k;if(right)ok++;d.classList.remove('ok','bad');d.classList.add(right?'ok':'bad')});
+    if(ok===CODE.length){var n=tries<=1?3:tries<=3?2:1;setTimeout(function(){endScreen('order',n,'الكود صحيح! عدد محاولاتك: '+tries,startOrder)},600)}
+    else{bad();msg.className='fb no';msg.textContent='الأسطر الصحيحة: '+ok+' من '+CODE.length+'. صحّح الأسطر الحمراء.'}
+  };
+  draw();
+}
+
+/* ===== game 3: quiz on the whole unit ===== */
+var TF=['صح','غلط'];
+var QS=[
+ {q:'نستخدم ........ لتحويل الإشارة القادمة من مزود الخدمة ISP إلى إشارة رقمية',o:['Port','Switches','Wi-Fi','Modem'],a:3,ltr:1,e:'المودم يحوّل الإشارة القادمة من مزود الخدمة إلى إشارة رقمية.'},
+ {q:'الجهاز الذي يوزع الإنترنت في كل مكان بالمنزل هو ........',o:['الراوتر','الماوس','الطابعة','الشاشة'],a:0,e:'الراوتر يوزع الإنترنت بالأسلاك أو لاسلكيًا Wi-Fi.'},
+ {q:'يتم توصيل الشبكات اللاسلكية بواسطة ........',o:['Port','Switches','Wi-Fi','Modem'],a:2,ltr:1,e:'Wi-Fi هو الذي يوصل الأجهزة لاسلكيًا.'},
+ {q:'بيئة ثلاثية الأبعاد تسمح لك بالتعامل مع ما تراه كأنه حقيقي، هي ........',o:['البصمة الرقمية','الواقع الافتراضي','المحولات','البلوتوث'],a:1,e:'الواقع الافتراضي VR نرتدي له نظارة خاصة.'},
+ {q:'تجمع تكنولوجيا ........ بين العالم الحقيقي والواقع الافتراضي',o:['المودم','الواقع المعزز','البلوتوث','البصمة الرقمية'],a:1,e:'الواقع المعزز AR يضيف أشياء رقمية إلى عالمنا الحقيقي.'},
+ {q:'تستخدم تكنولوجيا ........ في فتح الهاتف بواسطة التعرف على الوجه',o:['المحولات','الواقع الافتراضي','الذكاء الاصطناعي','التكنولوجيا المساعدة'],a:2,e:'الذكاء الاصطناعي AI يجعل الآلات تتصرف مثل الإنسان.'},
+ {q:'المصطلح الذي يصف شعور الشخص عند استخدام جهاز تكنولوجي هو ........',o:['الواقع المعزز','الذكاء الاصطناعي','الواقع الافتراضي','تجربة المستخدم'],a:3,e:'تجربة المستخدم User Experience.'},
+ {q:'نضغط على Ctrl + C للقيام بعملية ........',o:['النسخ','القص','اللصق','الحذف'],a:0,e:'Ctrl+C نسخ، Ctrl+X قص، Ctrl+V لصق.'},
+ {q:'أي نظام تشغيل من التالي مفتوح المصدر؟',o:['iOS','Windows','Android','Mac OS'],a:2,ltr:1,e:'Android مفتوح المصدر، أما iOS و Windows فمغلقان.'},
+ {q:'أي وسم يُستخدم لإضافة فقرة نصية في صفحة HTML؟',o:['<p>','<html>','<body>','<h1>'],a:0,ltr:1,e:'الوسم <p> لإنشاء فقرة نصية.'},
+ {q:'بنك المعرفة المصري EKB مثال لقاعدة بيانات عامة',o:TF,a:0,e:'EKB مكتبة رقمية كبيرة فيها معلومات مفيدة للدراسة.'},
+ {q:'المودم هو الجهاز الذي يوزع الإنترنت في كل مكان بالمنزل',o:TF,a:1,e:'الذي يوزع الإنترنت هو الراوتر وليس المودم.'},
+ {q:'لوحة مفاتيح «برايل» تساعد المكفوفين على الكتابة',o:TF,a:0,e:'برايل تساعد المكفوفين على القراءة والكتابة.'},
+ {q:'نظام التشغيل Windows هو نظام مفتوح المصدر',o:TF,a:1,e:'Windows نظام مغلق المصدر.'},
+ {q:'يستخدم الوسم <p> لإضافة صورة إلى صفحة الويب',o:TF,a:1,e:'لإضافة صورة نستخدم الوسم <img>.'},
+ {q:'يجب حفظ ملف HTML بامتداد .html',o:TF,a:0,e:'نحفظ الملف مثل first_page.html ثم نفتحه بالمتصفح.'}
+];
+function startQuiz(){
+  var list=shuffle(QS).slice(0,10),i=0,lives=3,score=0;
+  function show(){
+    screenEl.innerHTML='';
+    var bar=h('div',{class:'bar'});bar.appendChild(backBtn());
+    bar.appendChild(h('div',{class:'pill'},'السؤال '+(i+1)+' من '+list.length));
+    bar.appendChild(h('div',{class:'hearts'},'♥'.repeat(lives)+'♡'.repeat(3-lives)));
+    screenEl.appendChild(bar);
+    var q=list[i],card=h('div',{class:'card'});
+    card.appendChild(h('div',{class:'q'},esc(q.q)));
+    var opts=h('div',{class:'opts'});
+    var order=q.o===TF?[0,1]:shuffle([0,1,2,3]);
+    var fb=h('div',{class:'fb hidden'}),locked=false;
+    order.forEach(function(k){
+      var b=h('button',{class:'opt'+(q.ltr?' ltr':'')},esc(q.o[k]));
+      b.onclick=function(){if(locked)return;locked=true;
+        var ok=k===q.a;
+        [].forEach.call(opts.children,function(x,idx){if(order[idx]===q.a)x.classList.add('right')});
+        if(ok){good();score++;fb.className='fb ok';fb.textContent='أحسنت! '+q.e}
+        else{bad();lives--;b.classList.add('wrong');fb.className='fb no';fb.textContent='الإجابة الصحيحة: '+q.o[q.a]+'. '+q.e}
+        var nx=h('button',{class:'btn',style:'margin-top:14px'},(i===list.length-1||lives===0)?'النتيجة':'التالي');
+        nx.onclick=function(){click();i++;if(lives===0||i>=list.length)finish();else show()};
+        fb.appendChild(h('div',{},'')).appendChild(nx);
+      };
+      opts.appendChild(b);
+    });
+    card.appendChild(opts);card.appendChild(fb);screenEl.appendChild(card);
+  }
+  function finish(){var n=lives===0?(score>=6?1:0):(score>=9?3:score>=7?2:1);endScreen('quiz',n,'إجاباتك الصحيحة: '+score+' من '+list.length+(lives===0?' (انتهت القلوب)':''),startQuiz)}
+  show();
+}
+menu();
+</script>
+</body>
+</html>
